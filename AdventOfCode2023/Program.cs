@@ -1,7 +1,6 @@
-﻿using System.IO.MemoryMappedFiles;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
-AoC5();
+AoC6();
 Console.ReadLine();
 
 void AoC6()
@@ -249,31 +248,38 @@ humidity-to-location map:
         seeds.Add(double.Parse(seedValue));
     }
 
-    Dictionary<double, double> map = new Dictionary<double, double>();
+    List<List<double>> maps = new List<List<double>>();
     for (int i = 1; i < lines.Length; i++)
     {
         if (lines[i].Contains("map")  || i == lines.Length - 1)
         {
             for (int j = 0; j < seeds.Count; j++)
             {
-                if (map.ContainsKey(seeds[j]))
+                foreach (var map in maps)
                 {
-                    seeds[j] = map[seeds[j]];
+                    if (seeds[j] >= map[0] && seeds[j] <= map[1])
+                    {
+                        seeds[j] = seeds[j] + map[2] - map[0];
+                        break;
+                    }
                 }
             }
-            map = new Dictionary<double, double>();
+            maps = new List<List<double>>();
         }
         else
         {
             string[] numbers = lines[i].Split(" ", StringSplitOptions.RemoveEmptyEntries);
             double destination = double.Parse(numbers[0]);
-            double source = double.Parse(numbers[1]);
+            double sourceStart = double.Parse(numbers[1]);
             double range = double.Parse(numbers[2]);
+            double sourceEnd = sourceStart + range - 1;
 
-            for (double j = 0; j < range; j++)
+            maps.Add(new List<double>
             {
-                map.Add(source + j, destination + j);
-            }
+                sourceStart,
+                sourceEnd,
+                destination,
+            });
         }
     }
     seeds.Sort();
